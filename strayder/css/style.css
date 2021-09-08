@@ -1,0 +1,10 @@
+.form-final td input {
+  width: 100%;
+}
+.form-final tr td, tr th {
+  padding: 0;
+}
+.form-final input::-webkit-outer-spin-button,
+.form-final input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}

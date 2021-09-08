@@ -1,0 +1,7 @@
+final:
+  path: '/final'
+  defaults:
+    _title: 'Months, quarters, year.'
+    _form: '\Drupal\strayder\Form\FormFinal'
+  requirements:
+    _permission: 'access content'
