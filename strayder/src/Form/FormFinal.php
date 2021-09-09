@@ -33,11 +33,11 @@ class FormFinal extends FormBase {
       $form_state->set('num_of_rows', 1);
       $num_of_rows = 1;
     }
-    // 'Add row' button.
-    $form['actions']['add_row'] = [
+    // 'Add table' button.
+    $form['actions']['add_table'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Add row'),
-      '#submit' => ['::addRowCallback'],
+      '#value' => $this->t('Add table'),
+      '#submit' => ['::addTableCallback'],
       '#ajax' => [
         'callback' => '::ajaxAdd',
         'wrapper' => 'wrapper_form',
@@ -46,11 +46,11 @@ class FormFinal extends FormBase {
         ],
       ],
     ];
-    // 'Add table' button.
-    $form['actions']['add_table'] = [
+    // 'Add row' button.
+    $form['actions']['add_row'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Add table'),
-      '#submit' => ['::addTableCallback'],
+      '#value' => $this->t('Add row'),
+      '#submit' => ['::addRowCallback'],
       '#ajax' => [
         'callback' => '::ajaxAdd',
         'wrapper' => 'wrapper_form',
@@ -73,11 +73,10 @@ class FormFinal extends FormBase {
       ],
     ];
     $form['cell'] = [
-      '#type' => 'fieldset',
+      '#type' => 'markaup',
       '#prefix' => '<div id="wrapper_form">',
       '#suffix' => '</div>',
     ];
-
     for ($table = 0; $table < $num_of_table; $table++) {
       // To go through a full tree.
       $form['#tree'] = TRUE;
@@ -237,11 +236,11 @@ class FormFinal extends FormBase {
   /**
    * Function to search for the first set value.
    */
-  public function firstSetValue($array) {
+  public function firstSetValue($data) {
     // $first_set = the first set value.
-    foreach ($array as $first_set) {
+    foreach ($data as $first_set) {
       if ($first_set) {
-        return array_search($first_set, $array);
+        return array_search($first_set, $data);
       }
     }
     return NULL;
@@ -250,9 +249,9 @@ class FormFinal extends FormBase {
   /**
    * Function to search for the last set value.
    */
-  public function lastSetValue($array) {
+  public function lastSetValue($data) {
     // $last_filled = the last filled value.
-    $reversed_array = array_reverse($array);
+    $reversed_array = array_reverse($data);
     foreach ($reversed_array as $last_set) {
       if ($last_set) {
         return array_search($last_set, $reversed_array);
@@ -308,7 +307,7 @@ class FormFinal extends FormBase {
           // Getting the cells values.
           for ($cell_c = 0; $cell_c < count($months); $cell_c++) {
             // Table validation.
-            if ($tables !== 0) {
+            if ($tables > 0) {
               $cell = $months[$cell_c];
               // $first_table = the first table  for comparison.
               $first_table = $value[$table_c][$rows_c][$cell];
@@ -316,8 +315,8 @@ class FormFinal extends FormBase {
               for ($t = 0; $t < $tables; $t++) {
                 // $next_table = the second table for comparison.
                 $next_table = $value[$table_c + $t][$rows_c][$cell];
-                if ($first_table == '' && $next_table != ''
-                  xor $first_table != '' && $next_table == '') {
+                if (empty($first_table) && !empty($next_table)
+                  xor !empty($first_table) && empty($next_table)) {
                   return $form_state->setErrorByName('validation', $this->t(
                     'Invalid'));
                 }
@@ -377,7 +376,7 @@ class FormFinal extends FormBase {
     foreach ($array_part as $key => $table) {
       foreach ($table as $year_key => $year) {
         foreach ($year as $q_key => $quarter) {
-          if (array_sum($quarter) !== 0) {
+          if (array_sum($quarter) > 0) {
             $q_all[$key][$year_key][$q_key] = sprintf('%0.2f', (array_sum($quarter) + 1) / 3);
           }
         }
@@ -387,7 +386,7 @@ class FormFinal extends FormBase {
     foreach ($q_all as $key => $table) {
       foreach ($table as $year_key => $row) {
         foreach ($row as $q_key => $quarter) {
-          if ($quarter !== '') {
+          if (!empty($quarter)) {
             $form['cell'][$key][$year_key][$quarters[$q_key]]['#value'] = $quarter;
           }
         }
@@ -397,7 +396,7 @@ class FormFinal extends FormBase {
     // Combining quarters to a separate shift.
     foreach ($q_all as $key => $table) {
       foreach ($table as $year_key => $row) {
-        if (array_sum($row) !== 0) {
+        if (array_sum($row) > 0) {
           $year[$key][$year_key] = sprintf('%0.2f', (array_sum($row) + 1) / 4);
         }
       }
@@ -405,7 +404,7 @@ class FormFinal extends FormBase {
     // Filling the cell with the year.
     foreach ($year as $key => $table) {
       foreach ($table as $year_key => $row) {
-        if ($row !== 0) {
+        if ($row > 0) {
           $form['cell'][$key][$year_key]['ytd']['#value'] = $row;
         }
       }
