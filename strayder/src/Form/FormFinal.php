@@ -107,7 +107,7 @@ class FormFinal extends FormBase {
       $year = (int) ((date('Y')));
       // Create rows according to $num_of_rows.
       for ($row = 0; $row < $num_of_rows; $row++) {
-        $form['cell'][$table][$row]['year'] = [
+        $form['cell'][$table][$row]['Year'] = [
           '#type' => 'number',
           '#default_value' => $year + $row,
           '#disabled' => TRUE,
@@ -315,8 +315,8 @@ class FormFinal extends FormBase {
               for ($t = 0; $t < $tables; $t++) {
                 // $next_table = the second table for comparison.
                 $next_table = $value[$table_c + $t][$rows_c][$cell];
-                if (empty($first_table) && !empty($next_table)
-                  xor !empty($first_table) && empty($next_table)) {
+                if (empty($first_table) xor empty($next_table)
+                  ) {
                   return $form_state->setErrorByName('validation', $this->t(
                     'Invalid'));
                 }
